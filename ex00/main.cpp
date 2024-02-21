@@ -2,7 +2,6 @@
 // #include <iostream>
 
 int main(int ac, char *av[]) {
-
   std::string btcData;
   std::string userData;
 
@@ -22,7 +21,11 @@ int main(int ac, char *av[]) {
     return 1;
   }
 
-  BitcoinExchange btc(btcData);
+  try {
+    BitcoinExchange btc(btcData, userData);
+  } catch (std::exception &e) {
+    printErr(e.what());
+  }
 
   return 0;
 }
