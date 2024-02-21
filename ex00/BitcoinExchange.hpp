@@ -6,16 +6,20 @@
 class BitcoinExchange {
 private:
   std::map<std::string, float> btcDataMap;
+  std::map<std::string, float> userInputMap;
   std::string database;
+  std::string userInput;
+  std::string result;
 
 public:
-  BitcoinExchange(std::string &database);
+  BitcoinExchange(std::string &database, std::string &userInput);
   BitcoinExchange(BitcoinExchange const &rhs); // copy constructor
   BitcoinExchange &operator=(BitcoinExchange const &rhs);
   ~BitcoinExchange();
 
   void extractAndFillData(void);
   void printData(void);
+  void parseUserInput(void);
 };
 
 // file handlers
@@ -24,3 +28,8 @@ void printErr(std::string err);
 
 // not used
 bool checkFileExtention(std::string fileName, std::string extention);
+
+// helpers for validating user input
+bool validLine(std::string &userInput);
+std::string trim(std::string &str);
+std::string reduce(std::string &str);
