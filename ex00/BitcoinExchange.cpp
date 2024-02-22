@@ -121,10 +121,15 @@ bool validLine(std::string &userInputLine) {
   date = trim(date);   // space
   price = trim(price); // space
 
-  std::cout << "Line after trim => '" << userInputLine << "' ." << std::endl;
-  std::cout << "date => '" << date << "' ." << std::endl;
-  std::cout << "price => '" << price << "' ." << std::endl;
-  std::cout << "=============================" << std::endl;
+  // std::cout << "Line after trim => '" << userInputLine << "' ." << std::endl;
+  // std::cout << "date => '" << date << "' ." << std::endl;
+  // std::cout << "price => '" << price << "' ." << std::endl;
+  // std::cout << "=============================" << std::endl;
+
+  if (!validDate(date)) {
+    printErr("Not a valid date");
+    return false;
+  }
 
   return true;
 }
@@ -148,3 +153,57 @@ bool fileStream(std::string fileName, std::string &bufferData) {
 }
 
 void printErr(std::string err) { std::cerr << err << std::endl; }
+
+/* validate date and price functions */
+bool validDate(std::string &date) {
+  (void)date;
+  // check the format of the date is valid YYYY-MM-DD YYYY-MM-DD
+  std::stringstream ss(date);
+
+  std::string year;
+  std::getline(ss, year, '-');
+
+  std::string month;
+  std::getline(ss, month, '-');
+
+  std::string day;
+  std::getline(ss, day, '-');
+
+  /* first check if all element are full. and in the sepcifque length*/
+  if (year.empty() || month.empty() || day.empty())
+    return false;
+  if (year.length() != 4 || month.length() != 2 || day.length() != 2)
+    return false;
+
+  /* validate the date in numbers*/
+  std::stringstream converter;
+
+  size_t nYear;
+  size_t nMonth;
+  size_t nDay;
+
+  nDay = atol(day.c_str());
+  nMonth = atol(month.c_str());
+  nYear = atol(year.c_str());
+
+  /* check range of year and day and month*/
+  if (!(nMonth > 0 && nMonth <= 12)) {
+    printErr("Error in month");
+    return false;
+  }
+  /* need to validate day based on the month 2 . and the year if it accepts / on
+   * 4 */
+
+  std::cout << "year => '" << year << "' month => '" << month << "' day -> '"
+            << day << "' ." << std::endl;
+
+  std::cout << "As intergers -< year => '" << nYear << "' month => '" << nMonth
+            << "' day -> '" << nDay << "' ." << std::endl;
+  return true;
+}
+
+bool validPrice(std::string &price) {
+  (void)price;
+  // check the format of the price is valid
+  return true;
+}

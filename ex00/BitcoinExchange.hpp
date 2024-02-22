@@ -29,3 +29,7 @@ void printErr(std::string err);
 // helpers for validating user input
 bool validLine(std::string &userInput);
 std::string trim(std::string &str);
+
+// validate date and price functions
+bool validDate(std::string &date);
+bool validPrice(std::string &price);
