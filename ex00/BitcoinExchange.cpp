@@ -73,34 +73,13 @@ void BitcoinExchange::parseUserInput(void) {
 
   while (std::getline(data_stream, line)) {
     // should find a better solotion for this trim
-    line = reduce(line);
+    line = trim(line);
 
     if (!validLine(line)) {
       printErr("Not valid line");
     }
   }
   /* Check for valid format "|"*/
-}
-std::string reduce(std::string &str) {
-  // trim first
-  const std::string &fill = " ";
-  const std::string &whitespace = " \t";
-
-  std::string result = trim(str);
-
-  // replace sub ranges
-  size_t beginSpace = result.find_first_of(whitespace);
-  while (beginSpace != std::string::npos) {
-    size_t endSpace = result.find_first_not_of(whitespace, beginSpace);
-    size_t range = endSpace - beginSpace;
-
-    result.replace(beginSpace, range, fill);
-
-    size_t newStart = beginSpace + fill.length();
-    beginSpace = result.find_first_of(whitespace, newStart);
-  }
-
-  return result;
 }
 
 /* ---------- End of BitcoinExchange Member Funcitons ----------*/
@@ -127,13 +106,17 @@ bool validLine(std::string &userInputLine) {
 
   std::cout << "=============================" << std::endl;
 
-  if (userInputLine.find("|") == userInputLine.npos) {
-    // means no occurrence was found of |
+  if (userInputLine.find(" | ") == userInputLine.npos)
     return false;
-  }
   // extracting the two parts
   std::getline(line_stream, date, '|');
   std::getline(line_stream, price);
+
+  /* Checking line for specefique format "date | price"*/
+  if (date.find_first_of(" ") != date.find_last_of(" "))
+    return false;
+  if (price.find_first_of(" ") != price.find_last_of(" "))
+    return false;
 
   date = trim(date);   // space
   price = trim(price); // space
@@ -165,25 +148,3 @@ bool fileStream(std::string fileName, std::string &bufferData) {
 }
 
 void printErr(std::string err) { std::cerr << err << std::endl; }
-
-// not used for now
-bool checkFileExtention(std::string &fileName, std::string &extension) {
-  int len;
-
-  len = fileName.length();
-  try {
-
-    std::string checkAgainst(fileName.substr(len - 4));
-
-    if (len > 4) {
-      if (!extension.compare(checkAgainst)) {
-        return (0);
-      }
-    }
-    printErr("invalid file extension");
-  } catch (std::exception &e) {
-    printErr("invalid file extension");
-    return 1;
-  }
-  return true;
-}

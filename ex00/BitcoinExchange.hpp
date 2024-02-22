@@ -26,10 +26,6 @@ public:
 bool fileStream(std::string filename, std::string &data);
 void printErr(std::string err);
 
-// not used
-bool checkFileExtention(std::string fileName, std::string extention);
-
 // helpers for validating user input
 bool validLine(std::string &userInput);
 std::string trim(std::string &str);
-std::string reduce(std::string &str);
