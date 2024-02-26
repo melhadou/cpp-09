@@ -1,6 +1,8 @@
 ### C++ ###
 # Prerequisites
 *.d
+# file name
+btc
 
 # Compiled Object files
 *.slo

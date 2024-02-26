@@ -33,3 +33,6 @@ std::string trim(std::string &str);
 // validate date and price functions
 bool validDate(std::string &date);
 bool validPrice(std::string &price);
+bool isStrNumber(std::string str);
+bool checkDate(size_t year, size_t month, size_t day);
+bool isLeap(int year);

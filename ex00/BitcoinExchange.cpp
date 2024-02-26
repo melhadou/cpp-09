@@ -1,11 +1,10 @@
 #include "BitcoinExchange.hpp"
 // #include <algorithm>
-#include <algorithm>
 // #include <cstdio>
+#include <cctype>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
-#include <pthread.h>
 #include <sstream>
 #include <string>
 
@@ -76,7 +75,7 @@ void BitcoinExchange::parseUserInput(void) {
     line = trim(line);
 
     if (!validLine(line)) {
-      printErr("Not valid line");
+      printErr("\tNot valid line");
     }
   }
   /* Check for valid format "|"*/
@@ -104,10 +103,9 @@ bool validLine(std::string &userInputLine) {
   std::string price;
   std::stringstream line_stream(userInputLine);
 
-  std::cout << "=============================" << std::endl;
-
   if (userInputLine.find(" | ") == userInputLine.npos)
     return false;
+
   // extracting the two parts
   std::getline(line_stream, date, '|');
   std::getline(line_stream, price);
@@ -126,8 +124,14 @@ bool validLine(std::string &userInputLine) {
   // std::cout << "price => '" << price << "' ." << std::endl;
   // std::cout << "=============================" << std::endl;
 
+  std::cout << "=============================" << std::endl;
   if (!validDate(date)) {
     printErr("Not a valid date");
+    return false;
+  }
+  std::cout << "=============================" << std::endl;
+  if (!validPrice(price)) {
+    printErr("Not a valid price");
     return false;
   }
 
@@ -156,16 +160,13 @@ void printErr(std::string err) { std::cerr << err << std::endl; }
 
 /* validate date and price functions */
 bool validDate(std::string &date) {
-  (void)date;
   // check the format of the date is valid YYYY-MM-DD YYYY-MM-DD
   std::stringstream ss(date);
 
   std::string year;
   std::getline(ss, year, '-');
-
   std::string month;
   std::getline(ss, month, '-');
-
   std::string day;
   std::getline(ss, day, '-');
 
@@ -176,34 +177,78 @@ bool validDate(std::string &date) {
     return false;
 
   /* validate the date in numbers*/
-  std::stringstream converter;
+  if (!isStrNumber(year) || !isStrNumber(month) || !isStrNumber(day))
+    return false;
 
-  size_t nYear;
-  size_t nMonth;
-  size_t nDay;
-
-  nDay = atol(day.c_str());
-  nMonth = atol(month.c_str());
-  nYear = atol(year.c_str());
+  // as a string. check day if its valid based on the given month
+  size_t nYear = atol(year.c_str());
+  size_t nMonth = atol(month.c_str());
+  size_t nDay = atol(day.c_str());
 
   /* check range of year and day and month*/
-  if (!(nMonth > 0 && nMonth <= 12)) {
-    printErr("Error in month");
-    return false;
-  }
-  /* need to validate day based on the month 2 . and the year if it accepts / on
+
+  /* need to validate day based on the month 2 .
+   * and the year if it accepts / on
    * 4 */
+  if (!checkDate(nYear, nMonth, nDay))
+    return false;
 
   std::cout << "year => '" << year << "' month => '" << month << "' day -> '"
             << day << "' ." << std::endl;
 
   std::cout << "As intergers -< year => '" << nYear << "' month => '" << nMonth
             << "' day -> '" << nDay << "' ." << std::endl;
+
   return true;
 }
 
 bool validPrice(std::string &price) {
-  (void)price;
-  // check the format of the price is valid
+  float nPrice = atof(price.c_str()); // converting str to int
+  //
+  if (nPrice <= 0 || nPrice > 1000)
+    return false;
+
+  std::cout << "As intergers -< price => '" << nPrice << "' str -> price -> '"
+            << price << "' ." << std::endl;
   return true;
+}
+
+bool isStrNumber(std::string str) {
+  for (size_t i = 0; i < str.length(); i++)
+    if (!isdigit(str.at(i)))
+      return false;
+  return true;
+}
+
+bool checkDate(size_t year, size_t month, size_t day) {
+  if (month < 1 || month > 12)
+    return false;
+  if (day < 1 || day > 31)
+    return false;
+
+  // Handle February month
+  // with leap year
+  if (month == 2) {
+    if (isLeap(year))
+      return (day <= 29);
+    else
+      return (day <= 28);
+  }
+
+  // Months of April, June,
+  // Sept and Nov must have
+  // number of days less than
+  // or equal to 30.
+  if (month == 4 || month == 6 || month == 9 || month == 11)
+    return (day <= 30);
+
+  return true;
+}
+
+bool isLeap(int year) {
+  // Return true if year
+  // is a multiple of 4 and
+  // not multiple of 100.
+  // OR year is multiple of 400.
+  return (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0));
 }
