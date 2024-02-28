@@ -1,5 +1,5 @@
 #include "BitcoinExchange.hpp"
-// #include <algorithm>
+#include <algorithm>
 // #include <cstdio>
 #include <cctype>
 #include <cstdlib>
@@ -140,6 +140,16 @@ bool validLine(std::string &userInputLine) {
 
 /* ---------- End of user Input parser Functions ----------*/
 
+static bool checkHeader(std::string header, int type) {
+  // type = 2. check for db file
+  // type = 1. check for input file
+  if (type == 1 && (header.find(" | ") == header.npos))
+    return false;
+  if (type == 2 && (header.find(",") == header.npos))
+    return false;
+  return true;
+}
+
 // file handlers
 bool fileStream(std::string fileName, std::string &bufferData) {
   std::ifstream fs;
@@ -150,8 +160,29 @@ bool fileStream(std::string fileName, std::string &bufferData) {
     return false;
   ss << fs.rdbuf();      // reading from file
   bufferData = ss.str(); // writing data to buffer
+  fs.close();
 
   /* TODO: check first line is there and number of colomns */
+  std::string firstLine;
+  std::getline(ss, firstLine);
+  // type = 2. check for db file
+  // type = 1. check for input file
+  // std::cout << fileName << std::endl;
+  if (!fileName.compare("mini_data.csv")) {
+    size_t count = std::count(firstLine.begin(), firstLine.end(), ',');
+    // std::cout << count << " of ," << std::endl;
+    if (count != 1 || !checkHeader(firstLine, 2)) {
+      printErr("Envalid Header for Database");
+      return false;
+    }
+  } else {
+    size_t count = std::count(firstLine.begin(), firstLine.end(), '|');
+    // std::cout << count << " of |" << std::endl;
+    if (count != 1 || !checkHeader(firstLine, 1)) {
+      printErr("Envalid Header input file");
+      return false;
+    }
+  }
   bufferData.erase(0, bufferData.find("\n") + 1);
   return true;
 }
