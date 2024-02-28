@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 
 /* ---------- Start of BitcoinExchange Member Funcitons ----------*/
@@ -30,7 +31,7 @@ BitcoinExchange &BitcoinExchange::operator=(BitcoinExchange const &rhs) {
   if (this == &rhs)
     return *this;
   this->database = rhs.database;
-  this->btcDataMap = rhs.btcDataMap;
+  this->btcDatabase = rhs.btcDatabase;
   return *this;
 }
 
@@ -52,13 +53,13 @@ void BitcoinExchange::extractAndFillData() {
     std::getline(line_stream, price_str);
 
     price = atof(price_str.c_str());
-    this->btcDataMap[date] = price;
+    this->btcDatabase[date] = price;
   }
 }
 
 void BitcoinExchange::printData() {
   std::map<std::string, float>::iterator it;
-  for (it = this->btcDataMap.begin(); it != this->btcDataMap.end(); it++) {
+  for (it = this->btcDatabase.begin(); it != this->btcDatabase.end(); it++) {
     std::cout << "Date: => '" << it->first << "' : price => '" << it->second
               << "' ." << std::endl;
   }
@@ -75,10 +76,33 @@ void BitcoinExchange::parseUserInput(void) {
     line = trim(line);
 
     if (!validLine(line)) {
-      printErr("\tNot valid line");
+      printErr("\tNot valid lin");
     }
+    this->getRate("2022-01-08", 2.0);
   }
   /* Check for valid format "|"*/
+}
+
+std::string BitcoinExchange::getRate(std::string const &date, float price) {
+  // date type => '2012-11-02'
+  // look for date in the db, if not found look for nearby -1,
+  // after that return the price on bined with the date.
+  // calculate the rate of the btc needed, and contruct a proper string to be
+  // returned.
+  // else if date was not found throw of date not in range.
+
+  BitcoinExchange::iterator it = this->btcDatabase.lower_bound(date);
+
+  if (it == this->btcDatabase.end())
+    throw std::runtime_error("Date Not in range");
+
+  if (it->first != date && it != this->btcDatabase.begin())
+    it--;
+
+  std::cout << "date-> '" << it->first << "', price -> '" << it->second * price
+            << "' ." << std::endl;
+
+  return "";
 }
 
 /* ---------- End of BitcoinExchange Member Funcitons ----------*/
@@ -151,7 +175,7 @@ static bool checkHeader(std::string header, int type) {
 }
 
 // file handlers
-bool fileStream(std::string fileName, std::string &bufferData) {
+bool fileStream(std::string const &fileName, std::string &bufferData) {
   std::ifstream fs;
   std::stringstream ss;
 
@@ -187,7 +211,7 @@ bool fileStream(std::string fileName, std::string &bufferData) {
   return true;
 }
 
-void printErr(std::string err) { std::cerr << err << std::endl; }
+void printErr(std::string const &err) { std::cerr << err << std::endl; }
 
 /* validate date and price functions */
 bool validDate(std::string &date) {
