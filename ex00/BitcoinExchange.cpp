@@ -14,6 +14,9 @@
 BitcoinExchange::BitcoinExchange(std::string &rawData, std::string &userdata)
     : database(rawData), userInput(userdata) {
   // should extract data and fill it;
+  this->date = "";
+  this->value = 0;
+
   this->extractAndFillData();
   this->parseUserInput();
   // this->printData();
@@ -77,8 +80,12 @@ void BitcoinExchange::parseUserInput(void) {
 
     if (!validLine(line)) {
       printErr("\tNot valid lin");
+      // throw runtime_error("Error: not valid line");
+    } else {
+      this->getRate(this->date, this->value);
     }
-    this->getRate("2022-01-08", 2.0);
+    // std::cout << "date ->> " << this->date << " value of ->> " << this->value
+    //           << std::endl;
   }
   /* Check for valid format "|"*/
 }
@@ -90,12 +97,12 @@ std::string BitcoinExchange::getRate(std::string const &date, float price) {
   // calculate the rate of the btc needed, and contruct a proper string to be
   // returned.
   // else if date was not found throw of date not in range.
+  // std::cout << "date ->> " << date << " value of ->> " << price << std::endl;
 
   BitcoinExchange::iterator it = this->btcDatabase.lower_bound(date);
 
   if (it == this->btcDatabase.end())
     throw std::runtime_error("Date Not in range");
-
   if (it->first != date && it != this->btcDatabase.begin())
     it--;
 
@@ -121,7 +128,7 @@ std::string trim(std::string &str) {
   return str.substr(strBegin, strRange);
 }
 
-bool validLine(std::string &userInputLine) {
+bool BitcoinExchange::validLine(std::string &userInputLine) {
   /* Check for valid line. format is ->: "date | value" */
   std::string date;
   std::string price;
@@ -154,16 +161,17 @@ bool validLine(std::string &userInputLine) {
     return false;
   }
   std::cout << "=============================" << std::endl;
-  if (!validPrice(price)) {
+  if (!validValue(price)) {
     printErr("Not a valid price");
     return false;
   }
+
+  // store the required price and date to acces them later
 
   return true;
 }
 
 /* ---------- End of user Input parser Functions ----------*/
-
 static bool checkHeader(std::string header, int type) {
   // type = 2. check for db file
   // type = 1. check for input file
@@ -192,7 +200,7 @@ bool fileStream(std::string const &fileName, std::string &bufferData) {
   // type = 2. check for db file
   // type = 1. check for input file
   // std::cout << fileName << std::endl;
-  if (!fileName.compare("mini_data.csv")) {
+  if (!fileName.compare("data.csv")) {
     size_t count = std::count(firstLine.begin(), firstLine.end(), ',');
     // std::cout << count << " of ," << std::endl;
     if (count != 1 || !checkHeader(firstLine, 2)) {
@@ -214,7 +222,7 @@ bool fileStream(std::string const &fileName, std::string &bufferData) {
 void printErr(std::string const &err) { std::cerr << err << std::endl; }
 
 /* validate date and price functions */
-bool validDate(std::string &date) {
+bool BitcoinExchange::validDate(std::string &date) {
   // check the format of the date is valid YYYY-MM-DD YYYY-MM-DD
   std::stringstream ss(date);
 
@@ -248,23 +256,27 @@ bool validDate(std::string &date) {
   if (!checkDate(nYear, nMonth, nDay))
     return false;
 
-  std::cout << "year => '" << year << "' month => '" << month << "' day -> '"
-            << day << "' ." << std::endl;
+  // std::cout << "year => '" << year << "' month => '" << month << "' day -> '"
+  //           << day << "' ." << std::endl;
 
-  std::cout << "As intergers -< year => '" << nYear << "' month => '" << nMonth
-            << "' day -> '" << nDay << "' ." << std::endl;
+  // store the date as a string
+  this->date = year + "-" + month + "-" + day;
 
   return true;
 }
 
-bool validPrice(std::string &price) {
-  float nPrice = atof(price.c_str()); // converting str to int
+bool BitcoinExchange::validValue(std::string &value) {
+  float nValue = atof(value.c_str()); // converting str to int
   //
-  if (nPrice <= 0 || nPrice > 1000)
+  if (nValue <= 0 || nValue > 1000)
     return false;
 
-  std::cout << "As intergers -< price => '" << nPrice << "' str -> price -> '"
-            << price << "' ." << std::endl;
+  // std::cout << "As intergers -< price => '" << nValue << "' str -> price ->
+  // '"
+  //           << value << "' ." << std::endl;
+
+  // storing the value
+  this->value = nValue;
   return true;
 }
 

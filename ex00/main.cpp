@@ -12,7 +12,7 @@ int main(int ac, char *av[]) {
   }
 
   // reading data from file
-  if (!fileStream("mini_data.csv", btcData)) {
+  if (!fileStream("data.csv", btcData)) {
     printErr("Error: could not open the Database file");
     return 1;
   }

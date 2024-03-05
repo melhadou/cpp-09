@@ -9,7 +9,8 @@ private:
   std::map<std::string, float> userInputMap;
   std::string database;
   std::string userInput;
-  // std::string result;
+  std::string date;
+  float value;
 
 public:
   BitcoinExchange(std::string &database, std::string &userInput);
@@ -20,6 +21,11 @@ public:
   void extractAndFillData(void);
   void printData(void);
   void parseUserInput(void);
+
+  bool validDate(std::string &date);
+  bool validValue(std::string &value);
+  bool validLine(std::string &userInput);
+
   std::string getRate(std::string const &date, float price); // getting data
 
   // iterator for BitcoinExchange
@@ -31,12 +37,9 @@ bool fileStream(std::string const &filename, std::string &data);
 void printErr(std::string const &err);
 
 // helpers for validating user input
-bool validLine(std::string &userInput);
 std::string trim(std::string &str);
 
 // validate date and price functions
-bool validDate(std::string &date);
-bool validPrice(std::string &price);
 bool isStrNumber(std::string str);
 bool checkDate(size_t year, size_t month, size_t day);
 bool isLeap(int year);
