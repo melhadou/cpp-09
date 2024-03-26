@@ -3,6 +3,7 @@
 *.d
 # file name
 btc
+RPN
 
 # Compiled Object files
 *.slo
