@@ -74,9 +74,13 @@ void Rpn::parseAndCalc(std::string &input) {
         this->resDb.push(second / first);
         break;
       }
+    } else if (this->resDb.size() < 2 && currChar == mOperator) {
+      throw std::runtime_error("Error: invalid size");
     }
     i++;
   }
+  if (!mOperator)
+    throw std::runtime_error("Error: no operator were found");
 }
 
 std::stack<int> Rpn::getResDb() const { return this->resDb; }
