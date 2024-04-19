@@ -34,53 +34,100 @@ static int isOperator(char currChar) {
 }
 
 void Rpn::parseAndCalc(std::string &input) {
-  std::string::size_type i = 0;
-  char currChar;
-  char mOperator;
+  // std::string::size_type i = 0;
+  // char currChar;
+  // char mOperator;
 
-  while (i < input.length()) {
-    currChar = input.at(i);
+  // while (i < input.length()) {
+  //   currChar = input.at(i);
 
-    switch (currChar) {
-    case '+':
-    case '-':
-    case '*':
-    case '/':
-      mOperator = currChar;
-      break;
+  //   switch (currChar) {
+  //   case '+':
+  //   case '-':
+  //   case '*':
+  //   case '/':
+  //     mOperator = currChar;
+  //     break;
+  //   }
+  //   if (isdigit(currChar))
+  //     this->resDb.push(currChar - '0');
+  //   else if (!isOperator(currChar) && !isspace(currChar))
+  //     throw std::runtime_error("Error");
+
+  //   if (currChar == mOperator && this->resDb.size() >= 2) {
+  //     int first = this->resDb.top();
+  //     this->resDb.pop();
+  //     int second = this->resDb.top();
+  //     this->resDb.pop();
+
+  //     switch (mOperator) {
+  //     case '+':
+  //       this->resDb.push(second + first);
+  //       break;
+  //     case '-':
+  //       this->resDb.push(second - first);
+  //       break;
+  //     case '*':
+  //       this->resDb.push(second * first);
+  //       break;
+  //     case '/':
+  //       this->resDb.push(second / first);
+  //       break;
+  //     }
+  //   } else if (this->resDb.size() < 2 && currChar == mOperator) {
+  //     throw std::runtime_error("Error: invalid size");
+  //   }
+  //   i++;
+  // }
+  // if (!mOperator)
+  //   throw std::runtime_error("Error: no operator were found");
+  char mOperator = 0;
+
+  for (size_t i = 0; i < input.length(); ++i) {
+    char currChar = input.at(i);
+
+    if (isdigit(currChar)) {
+      resDb.push(currChar - '0');
+    } else if (!isspace(currChar)) {
+      if (mOperator == 0 && isOperator(currChar)) {
+        mOperator = currChar;
+      } else if (isOperator(currChar)) {
+        throw std::runtime_error("Error: consecutive operators found.");
+      } else {
+        throw std::runtime_error("Error: invalid character in input.");
+      }
     }
-    if (isdigit(currChar))
-      this->resDb.push(currChar - '0');
-    else if (!isOperator(currChar) && !isspace(currChar))
-      throw std::runtime_error("Error");
 
-    if (currChar == mOperator && this->resDb.size() >= 2) {
-      int first = this->resDb.top();
-      this->resDb.pop();
-      int second = this->resDb.top();
-      this->resDb.pop();
+    if (mOperator && resDb.size() >= 2) {
+      int first = resDb.top();
+      resDb.pop();
+      int second = resDb.top();
+      resDb.pop();
 
       switch (mOperator) {
       case '+':
-        this->resDb.push(second + first);
+        resDb.push(second + first);
         break;
       case '-':
-        this->resDb.push(second - first);
+        resDb.push(second - first);
         break;
       case '*':
-        this->resDb.push(second * first);
+        resDb.push(second * first);
         break;
       case '/':
-        this->resDb.push(second / first);
+        if (first == 0) {
+          throw std::runtime_error("Error: division by zero.");
+        }
+        resDb.push(second / first);
         break;
       }
-    } else if (this->resDb.size() < 2 && currChar == mOperator) {
-      throw std::runtime_error("Error: invalid size");
+      mOperator = 0; // Reset the operator
     }
-    i++;
   }
-  if (!mOperator)
-    throw std::runtime_error("Error: no operator were found");
+
+  if (resDb.size() != 1) {
+    throw std::runtime_error("Error: invalid expression.");
+  }
 }
 
 std::stack<int> Rpn::getResDb() const { return this->resDb; }
