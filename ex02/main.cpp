@@ -16,14 +16,13 @@ int main(int ac, char *av[]) {
   }
 
 	try {
-  std::vector<std::pair<int, int> > pairs =
+  std::vector<int > pairs =
       pMergeMe<std::vector<std::pair<int, int> >, std::vector<int> >(ac - 1, &av[1]);
 		// use itterator to print the pairs
-		std::vector<std::pair<int, int> >::iterator it;
-
+		std::vector<int>::iterator it;
 		it = pairs.begin();
 		while (it != pairs.end()) {
-			std::cout << it->first << "\n" << it->second << std::endl;
+			std::cout << *it << std::endl;
 			it++;
 		}
 	} catch (std::runtime_error &e) {

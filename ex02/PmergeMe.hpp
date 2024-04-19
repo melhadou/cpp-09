@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <cstdlib>
 #include <stdexcept>
 #include <utility>
@@ -49,7 +50,7 @@ Container extractMainChain(const InputContainer &input) {
   return res;
 }
 
-template <typename PairedVec, typename Type> PairedVec pMergeMe(int ac, char *av[]) {
+template <typename PairedVec, typename Type> Type pMergeMe(int ac, char *av[]) {
   // check if all arguments are positive integers
   if (!checkArgs(ac, av)) {
 		throw std::runtime_error("Error: bad arguments.(positive integer only)");
@@ -63,14 +64,16 @@ template <typename PairedVec, typename Type> PairedVec pMergeMe(int ac, char *av
 		last = atoi(av[ac - 1]);
 	
 	PairedVec pairs = makePairs<PairedVec>(ac, av);
-	// Type mainChain = extractMainChain<Type>(pairs);
+	// sorting the pairs
+	std::sort(pairs.begin(), pairs.end());
+	Type mainChain = extractMainChain<Type>(pairs);
 
 	if(odd){
 		std::cout << "odd" << std::endl;
-		// mainChain.insert(mainChain.begin(), last);
+		mainChain.insert(mainChain.end(), last);
 		// should add it to proper place after parsing
-		std::cout << last << "\n";
+		// std::cout << last << "\n";
 	}
   // start sorting
-  return pairs;
+  return mainChain;
 }
