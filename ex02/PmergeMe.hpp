@@ -18,6 +18,19 @@ public:
 //
 bool checkArgs(int argc, char **argv);
 
+template <typename Container>
+void insertFromPendToMainchain(Container &pend, Container &mainchain) {
+ for (typename Container::iterator it = pend.begin(); it != pend.end(); ++it) {
+    int element = *it; // Dereference iterator to get the element
+
+    // Find insertion position using a linear search
+	 typename Container::iterator insertIt = std::lower_bound(mainchain.begin(), mainchain.end(), element);
+
+    // Insert element at the iterator's position
+    mainchain.insert(insertIt, element);
+  }
+}
+
 template <typename Pair> Pair makePairs(int ac, char *av[]) {
   int nb1 = 0;
   int nb2 = 0;
@@ -43,7 +56,20 @@ Container extractMainChain(const InputContainer &input) {
 
   while (i < input.size()) {
     res[i] = input[i].first;
-		std::cout << "pair[" << i << "]: " << input[i].first << " " << input[i].second << std::endl;
+		// std::cout << "pair[" << i << "]: " << input[i].first << " " << input[i].second << std::endl;
+    i++;
+  }
+
+  return res;
+}
+
+template <typename Container, typename InputContainer>
+Container extractPendChain(const InputContainer &input) {
+  Container res(input.size());
+  typename InputContainer::size_type i = 0;
+
+  while (i < input.size()) {
+    res[i] = input[i].second;
     i++;
   }
 
@@ -130,20 +156,23 @@ template <typename PairedVec, typename Type> Type pMergeMe(int ac, char *av[]) {
 		last = atoi(av[ac - 1]);
 	
 	PairedVec pairs = makePairs<PairedVec>(ac, av);
-	// sorting the pairs
-	// swapPair<PairedVec>(pairs); // already done when making the pairs
-	// std::sort(pairs.begin(), pairs.end());
-	
+
 	// sorting the pairs based on the first element using recursive merge sort
 	mergeRecursive<PairedVec>(pairs.begin(), pairs.end());
 
 	Type mainChain = extractMainChain<Type>(pairs);
+	Type pendChain = extractPendChain<Type>(pairs);
+
+	insertFromPendToMainchain<Type>(pendChain, mainChain);
 
 	if(odd){
-		std::cout << "odd" << std::endl;
-		mainChain.insert(mainChain.end(), last);
+		// std::cout << "odd" << std::endl;
 		// should add it to proper place after parsing
 		// std::cout << last << "\n";
+	 typename Type::iterator insertIt = std::lower_bound(mainChain.begin(), mainChain.end(), last);
+
+    // Insert element at the iterator's position
+    mainChain.insert(insertIt, last);
 	}
   // start sorting
   return mainChain;
