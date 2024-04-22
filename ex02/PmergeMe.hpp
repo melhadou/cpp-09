@@ -26,10 +26,9 @@ template <typename Pair> Pair makePairs(int ac, char *av[]) {
   for (int i = 0; i + 1 < ac;) {
     nb1 = atoi(av[i]);
     nb2 = atoi(av[i + 1]);
-		if (nb1 > nb2)
-			pairs.push_back(std::make_pair(nb1, nb2));
-		else
+		if (nb1 < nb2)
 			pairs.push_back(std::make_pair(nb2, nb1));
+		else pairs.push_back(std::make_pair(nb1, nb2));
 		// sorting the pairs
 		i += 2;
   }
@@ -44,10 +43,77 @@ Container extractMainChain(const InputContainer &input) {
 
   while (i < input.size()) {
     res[i] = input[i].first;
+		std::cout << "pair[" << i << "]: " << input[i].first << " " << input[i].second << std::endl;
     i++;
   }
 
   return res;
+}
+
+template<typename Container>
+void swapPair(Container &pairs){
+	// define itterator
+	typename Container::size_type i = 0;
+
+	while(i < pairs.size())
+	{
+		if (pairs[i].first < pairs[i].second )
+			std::swap(pairs[i].first, pairs[i].second);
+		i++;
+	}
+
+}
+
+
+template<typename Container>
+void merge(typename Container::iterator begin, typename Container::iterator middle, typename Container::iterator end)
+{
+	// save the middle and begin. so we can recopy the array back to original
+	typename Container::iterator oriBegin = begin;
+	typename Container::iterator oriMiddle = middle;
+	
+	typename Container::iterator tmp;
+
+	Container result;
+	// loop over until middle or begin are exhausted
+	while((begin != oriMiddle) || (middle != end))
+	{
+		if (begin == oriMiddle)
+			tmp = middle++;
+		else if (middle == end)
+			tmp = begin++;
+		else {
+			// element are in both. so we compare
+			if (begin->first < middle->first)
+				tmp = begin++;
+			else
+				tmp = middle++;
+			// std::cout << tmp->first << std::endl;
+			// saving
+		}
+		result.push_back(*tmp);
+	}
+	// loop over res. and copy back to original begin
+	for (size_t i = 0; i < result.size(); i++)
+	{
+		// start copying to original
+		*oriBegin = result[i];
+		oriBegin++;
+	}
+}
+
+template < typename Container>
+void mergeRecursive(typename Container::iterator begin,
+										typename Container::iterator end)
+{
+	typename Container::iterator middle = begin + (end - begin)/ 2;
+	if (end - begin > 1 && begin != end)
+	{
+		mergeRecursive<Container>(begin, middle);
+		mergeRecursive<Container>(middle, end);
+	}
+
+	merge<Container>(begin, middle, end);
 }
 
 template <typename PairedVec, typename Type> Type pMergeMe(int ac, char *av[]) {
@@ -65,7 +131,12 @@ template <typename PairedVec, typename Type> Type pMergeMe(int ac, char *av[]) {
 	
 	PairedVec pairs = makePairs<PairedVec>(ac, av);
 	// sorting the pairs
-	std::sort(pairs.begin(), pairs.end());
+	// swapPair<PairedVec>(pairs); // already done when making the pairs
+	// std::sort(pairs.begin(), pairs.end());
+	
+	// sorting the pairs based on the first element using recursive merge sort
+	mergeRecursive<PairedVec>(pairs.begin(), pairs.end());
+
 	Type mainChain = extractMainChain<Type>(pairs);
 
 	if(odd){

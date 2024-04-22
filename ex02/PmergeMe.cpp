@@ -14,3 +14,12 @@ bool checkArgs(int ac, char **av) {
   }
   return true;
 }
+
+// should implment the jacobthal sequence algorithm
+size_t jacobthal(int n) {
+	if (n == 0)
+		return 0;
+	if (n == 1)
+		return 1;
+	return 2 * jacobthal(n - 1) + jacobthal(n - 2);
+}
