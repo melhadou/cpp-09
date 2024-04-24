@@ -34,53 +34,6 @@ static int isOperator(char currChar) {
 }
 
 void Rpn::parseAndCalc(std::string &input) {
-  // std::string::size_type i = 0;
-  // char currChar;
-  // char mOperator;
-
-  // while (i < input.length()) {
-  //   currChar = input.at(i);
-
-  //   switch (currChar) {
-  //   case '+':
-  //   case '-':
-  //   case '*':
-  //   case '/':
-  //     mOperator = currChar;
-  //     break;
-  //   }
-  //   if (isdigit(currChar))
-  //     this->resDb.push(currChar - '0');
-  //   else if (!isOperator(currChar) && !isspace(currChar))
-  //     throw std::runtime_error("Error");
-
-  //   if (currChar == mOperator && this->resDb.size() >= 2) {
-  //     int first = this->resDb.top();
-  //     this->resDb.pop();
-  //     int second = this->resDb.top();
-  //     this->resDb.pop();
-
-  //     switch (mOperator) {
-  //     case '+':
-  //       this->resDb.push(second + first);
-  //       break;
-  //     case '-':
-  //       this->resDb.push(second - first);
-  //       break;
-  //     case '*':
-  //       this->resDb.push(second * first);
-  //       break;
-  //     case '/':
-  //       this->resDb.push(second / first);
-  //       break;
-  //     }
-  //   } else if (this->resDb.size() < 2 && currChar == mOperator) {
-  //     throw std::runtime_error("Error: invalid size");
-  //   }
-  //   i++;
-  // }
-  // if (!mOperator)
-  //   throw std::runtime_error("Error: no operator were found");
   char mOperator = 0;
 
   for (size_t i = 0; i < input.length(); ++i) {
