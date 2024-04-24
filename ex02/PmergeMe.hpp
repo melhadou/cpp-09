@@ -166,10 +166,7 @@ template <typename PairedVec, typename Type> Type pMergeMe(int ac, char *av[]) {
 	insertFromPendToMainchain<Type>(pendChain, mainChain);
 
 	if(odd){
-		// std::cout << "odd" << std::endl;
-		// should add it to proper place after parsing
-		// std::cout << last << "\n";
-	 typename Type::iterator insertIt = std::lower_bound(mainChain.begin(), mainChain.end(), last);
+		typename Type::iterator insertIt = std::lower_bound(mainChain.begin(), mainChain.end(), last);
 
     // Insert element at the iterator's position
     mainChain.insert(insertIt, last);
