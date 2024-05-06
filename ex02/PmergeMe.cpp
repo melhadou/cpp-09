@@ -1,25 +1,31 @@
 #include "PmergeMe.hpp"
 #include <cctype>
 
-bool checkArgs(int ac, char **av) {
-  for (int i = 1; i < ac; i++) {
-    if (av[i][0] == '\0')
-      return false;
-
-    for (int j = 0; av[i][j]; j++) {
-      if (!std::isdigit(av[i][j])) {
-        return false;
-      }
-    }
-  }
-  return true;
+// ortodox canonical form
+PmergeMe::PmergeMe() {
 }
 
-// should implment the jacobthal sequence algorithm
-size_t jacobthal(int n) {
-	if (n == 0)
-		return 0;
-	if (n == 1)
-		return 1;
-	return 2 * jacobthal(n - 1) + jacobthal(n - 2);
+PmergeMe::PmergeMe(const PmergeMe &other) {
+	*this = other;
+}
+
+PmergeMe &PmergeMe::operator=(const PmergeMe &other) {
+	(void)other; // avoid warning
+	return *this;
+}
+
+PmergeMe::~PmergeMe() {
+}
+// ----- end of ortodox canonical form ------
+
+bool checkArgs(int ac, char **av) {
+	// check if args are positive integers
+	for (int i = 0; i < ac; i++) {
+		for (int j = 0; av[i][j] != '\0'; j++) {
+			if (!isdigit(av[i][j])) {
+				return false;
+			}
+		}
+	}
+	return true;
 }

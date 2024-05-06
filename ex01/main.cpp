@@ -1,8 +1,8 @@
 #include "RPN.hpp"
 #include <iostream>
 #include <stdexcept>
+
 int main(int ac, char *av[]) {
-  //
   if (ac != 2) {
     std::cerr << "Usage: ./RPN \"8 9 *\"" << std::endl;
     return 1;

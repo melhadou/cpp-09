@@ -1,16 +1,18 @@
 // used container Vector
-// #include "PmergeMe.hpp"
+// used container Deque
 
 #include "PmergeMe.hpp"
 #include <deque>
 #include <iostream>
 #include <utility>
 #include <vector>
+#include <sys/time.h>
 
 typedef std::vector<std::pair<int, int> >::size_type v_size;
 
 int main(int ac, char *av[]) {
 
+	// add checking for positive
   if (ac <= 1) {
     std::cerr << "Error: bad arguments.(positive integer only)" << std::endl;
     return 1;
@@ -24,17 +26,26 @@ int main(int ac, char *av[]) {
 	}
 	std::cout << std::endl;
 
-	clock_t startTime;
 	double timeTaken;
+	
+	size_t startTime;
+	size_t timeEnd;
 
-	startTime = clock();
+	struct timeval timeCount;
 
 	try {
+		gettimeofday(&timeCount, NULL);
+		 startTime = (timeCount.tv_sec * 1000000 + timeCount.tv_usec);
+
 		std::vector<int > pairs =
-		 pMergeMe<std::vector<std::pair<int, int> >, std::vector<int> >(ac - 1, &av[1]);
+		 merge_insert<std::vector<std::pair<int, int> >, std::vector<int> >(ac - 1, &av[1]);
+		
+		gettimeofday(&timeCount, NULL);
+		 timeEnd = (timeCount.tv_sec * 1000000 + timeCount.tv_usec);
+
+		timeTaken = timeEnd - startTime;
 		// use itterator to print the pairs
-  	timeTaken = static_cast<double>(clock() - startTime) / CLOCKS_PER_SEC * 1000000;
-	
+		
 		std::vector<int>::iterator it;
 		it = pairs.begin();
    	std::cout << "After: ";
@@ -43,15 +54,18 @@ int main(int ac, char *av[]) {
       it++;
     }
 		std::cout << std::endl;
-  
 		std::cout << "Time to process a range of " << ac - 1
             << " elements with std::vector : " << timeTaken << " us" << std::endl;
 
-		startTime = clock();
+		startTime = (timeCount.tv_sec * 1000000 + timeCount.tv_usec);
 
 		// Sorting using deque. no need to catch data. its the same
-		pMergeMe<std::deque<std::pair<int, int> >, std::deque<int> >(ac - 1, &av[1]);
-		timeTaken = static_cast<double>(clock() - startTime) / CLOCKS_PER_SEC * 1000000;
+		merge_insert<std::deque<std::pair<int, int> >, std::deque<int> >(ac - 1, &av[1]);
+		
+		gettimeofday(&timeCount, NULL);
+		timeEnd = (timeCount.tv_sec * 1000000 + timeCount.tv_usec);
+
+		timeTaken = timeEnd - startTime;
 
 		std::cout << "Time to process a range of " << ac - 1
 							<< " elements with std::deque : " << timeTaken << " us" << std::endl;

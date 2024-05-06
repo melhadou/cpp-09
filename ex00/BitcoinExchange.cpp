@@ -78,7 +78,7 @@ void BitcoinExchange::parseUserInput(void) {
     line = trim(line);
     try {
       if (!validLine(line)) {
-        printErr("Error: bad input => " + date);
+        printErr("Error: bad input => " + line);
       } else {
         this->getRate(this->date, this->value);
       }
@@ -96,7 +96,7 @@ std::string BitcoinExchange::getRate(std::string const &date, float price) {
   if (it->first != date && it != this->btcDatabase.begin())
     it--;
 
-  std::cout << date << " => " << price << " = " << price * it->second << " ."
+  std::cout << date << " => " << price << " = " << price * it->second
             << std::endl;
 
   return "";
@@ -174,14 +174,16 @@ bool fileStream(std::string const &fileName, std::string &bufferData) {
   std::getline(ss, firstLine);
   if (!fileName.compare("data.csv")) {
     size_t count = std::count(firstLine.begin(), firstLine.end(), ',');
-    // std::cout << count << " of ," << std::endl;
+		if (firstLine.compare("date,exchange_rate")) 
+			throw std::runtime_error("Error: Invalid Header in data.csv");
     if (count != 1 || !checkHeader(firstLine, 2)) {
       printErr("Envalid Header for Database");
       return false;
     }
   } else {
     size_t count = std::count(firstLine.begin(), firstLine.end(), '|');
-    // std::cout << count << " of |" << std::endl;
+		if (firstLine.compare("date | value")) 
+			throw std::runtime_error("Error: Invalid Header in input file");
     if (count != 1 || !checkHeader(firstLine, 1)) {
       printErr("Envalid Header input file");
       return false;
