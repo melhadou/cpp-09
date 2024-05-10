@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <stdexcept>
 #include <utility>
+#include <iostream>
 
 class PmergeMe {
 private:
@@ -15,7 +16,7 @@ public:
 
 // utils
 //
-bool checkArgs(int argc, char **argv);
+// bool checkArgs(int argc, char **argv);
 
 template <typename Container>
 void insertFromPendToMainchain(Container &pend, Container &mainchain) {
@@ -89,7 +90,6 @@ void swapPair(Container &pairs){
 
 }
 
-
 template<typename Container>
 void merge(typename Container::iterator begin, typename Container::iterator middle, typename Container::iterator end)
 {
@@ -117,46 +117,12 @@ void merge(typename Container::iterator begin, typename Container::iterator midd
 
     // Copy the merged elements back to the original container
     std::copy(result.begin(), result.end(), begin);
-
-	// // save the middle and begin. so we can recopy the array back to original
-	// typename Container::iterator oriBegin = begin;
-	// typename Container::iterator oriMiddle = middle;
-	// 
-	// typename Container::iterator tmp;
-
-	// Container result;
-	// // loop over until middle or begin are exhausted
-	// while((begin != oriMiddle) || (middle != end))
-	// {
-	// 	if (begin == oriMiddle)
-	// 		tmp = middle++;
-	// 	else if (middle == end)
-	// 		tmp = begin++;
-	// 	else {
-	// 		// element are in both. so we compare
-	// 		if (begin->first < middle->first)
-	// 			tmp = begin++;
-	// 		else
-	// 			tmp = middle++;
-	// 		// std::cout << tmp->first << std::endl;
-	// 		// saving
-	// 	}
-	// 	result.push_back(*tmp);
-	// }
-	// // loop over res. and copy back to original begin
-	// for (size_t i = 0; i < result.size(); i++)
-	// {
-	// 	// start copying to original
-	// 	*oriBegin = result[i];
-	// 	oriBegin++;
-	// }
 }
 
 template < typename Container>
 void mergeRecursive(typename Container::iterator begin,
 										typename Container::iterator end)
 {
-
 	typename Container::iterator middle = begin + (end - begin) / 2;
 	if (end - begin > 1 && begin != end)
 	{
@@ -168,15 +134,11 @@ void mergeRecursive(typename Container::iterator begin,
 }
 
 template <typename PairedVec, typename Type> Type merge_insert(int ac, char *av[]) {
-  // check if all arguments are positive integers
-  if (!checkArgs(ac, av)) {
-		throw std::runtime_error("Error: bad arguments.(positive integer only)");
-  }
-
 	// check if the number of arguments is even
   bool odd = ((ac) % 2 == 0) ? false : true;
 
 	int last;
+
 	if(odd) 
 		last = atoi(av[ac - 1]);
 	

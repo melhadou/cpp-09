@@ -10,13 +10,30 @@
 
 typedef std::vector<std::pair<int, int> >::size_type v_size;
 
+bool checkArgs(int ac, char **av) {
+	++av;
+	--ac; // sciping the program name 
+	
+	// check if args are positive integers
+	for (int i = 0; i < ac; i++)
+		for (int j = 0; av[i][j] != '\0'; j++)
+			if (!isdigit(av[i][j]))
+				return false;
+
+	return true;
+}
+
 int main(int ac, char *av[]) {
 
-	// add checking for positive
   if (ac <= 1) {
-    std::cerr << "Error: bad arguments.(positive integer only)" << std::endl;
     return 1;
   }
+
+	// check if all arguments are positive integers
+	if (!checkArgs(ac, av)) {
+		std::cout << "Error: bad arguments (positive integer only)." << std::endl;
+		return 1;
+	}
 
 	std::cout << "Before: ";
 	int i = 1;
@@ -34,6 +51,7 @@ int main(int ac, char *av[]) {
 	struct timeval timeCount;
 
 	try {
+
 		gettimeofday(&timeCount, NULL);
 		 startTime = (timeCount.tv_sec * 1000000 + timeCount.tv_usec);
 
