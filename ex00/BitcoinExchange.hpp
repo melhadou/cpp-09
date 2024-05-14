@@ -5,12 +5,12 @@
 
 class BitcoinExchange {
 private:
-  std::map<std::string, float> btcDatabase;
-  std::map<std::string, float> userInputMap;
+  std::map<std::string, double> btcDatabase;
+  std::map<std::string, double> userInputMap;
   std::string database;
   std::string userInput;
   std::string date;
-  float value;
+  double value;
 
 public:
   BitcoinExchange(std::string &database, std::string &userInput);
@@ -26,10 +26,10 @@ public:
   bool validValue(std::string &value);
   bool validLine(std::string &userInput);
 
-  std::string getRate(std::string const &date, float price); // getting data
+  std::string getRate(std::string const &date, double price); // getting data
 
   // iterator for BitcoinExchange
-  typedef std::map<std::string, float>::iterator iterator;
+  typedef std::map<std::string, double>::iterator iterator;
 };
 
 // file handlers

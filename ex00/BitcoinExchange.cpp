@@ -4,6 +4,7 @@
 #include <cctype>
 #include <cstdlib>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -46,7 +47,7 @@ void BitcoinExchange::extractAndFillData() {
   std::string date;
   std::string line;
 
-  float price = 0;
+  double price = 0;
   while (std::getline(data_stream, line)) {
     std::stringstream line_stream(line);
     std::string price_str;
@@ -61,7 +62,7 @@ void BitcoinExchange::extractAndFillData() {
 }
 
 void BitcoinExchange::printData() {
-  std::map<std::string, float>::iterator it;
+  std::map<std::string, double>::iterator it;
   for (it = this->btcDatabase.begin(); it != this->btcDatabase.end(); it++) {
     std::cout << "Date: => '" << it->first << "' : price => '" << it->second
               << "' ." << std::endl;
@@ -88,16 +89,24 @@ void BitcoinExchange::parseUserInput(void) {
   }
 }
 
-std::string BitcoinExchange::getRate(std::string const &date, float price) {
+std::string BitcoinExchange::getRate(std::string const &date, double price) {
   BitcoinExchange::iterator it = this->btcDatabase.lower_bound(date);
 
-  if (it == this->btcDatabase.end())
-    throw std::runtime_error("Date Not in range");
-  if (it->first != date && it != this->btcDatabase.begin())
-    it--;
+  if (it->first == this->btcDatabase.begin()->first) {
+    throw std::runtime_error("date not in range");
+  }
 
-  std::cout << date << " => " << price << " = " << price * it->second
-            << std::endl;
+  if (it == this->btcDatabase.end()) {
+    --it;
+    std::cout << std::setprecision(15) << it->first << " => " << price << " = "
+              << price * it->second << std::endl;
+  } else {
+    if (it->first != date && it != this->btcDatabase.begin())
+      it--;
+
+    std::cout << std::setprecision(15) << date << " => " << price << " = "
+              << price * it->second << std::endl;
+  }
 
   return "";
 }
@@ -124,7 +133,7 @@ bool BitcoinExchange::validLine(std::string &userInputLine) {
   std::string price;
   std::stringstream line_stream(userInputLine);
 
-  if (userInputLine.find(" | ") == userInputLine.npos)
+  if (userInputLine.find("|") == userInputLine.npos)
     return false;
 
   // extracting the two parts
@@ -132,10 +141,10 @@ bool BitcoinExchange::validLine(std::string &userInputLine) {
   std::getline(line_stream, price);
 
   /* Checking line for specefique format "date | price"*/
-  if (date.find_first_of(" ") != date.find_last_of(" "))
-    return false;
-  if (price.find_first_of(" ") != price.find_last_of(" "))
-    return false;
+  // if (date.find_first_of(" ") != date.find_last_of(" "))
+  //   return false;
+  // if (price.find_first_of(" ") != price.find_last_of(" "))
+  //   return false;
 
   date = trim(date);   // space
   price = trim(price); // space
@@ -174,16 +183,16 @@ bool fileStream(std::string const &fileName, std::string &bufferData) {
   std::getline(ss, firstLine);
   if (!fileName.compare("data.csv")) {
     size_t count = std::count(firstLine.begin(), firstLine.end(), ',');
-		if (firstLine.compare("date,exchange_rate")) 
-			throw std::runtime_error("Error: Invalid Header in data.csv");
+    if (firstLine.compare("date,exchange_rate"))
+      throw std::runtime_error("Error: Invalid Header in data.csv");
     if (count != 1 || !checkHeader(firstLine, 2)) {
       printErr("Envalid Header for Database");
       return false;
     }
   } else {
     size_t count = std::count(firstLine.begin(), firstLine.end(), '|');
-		if (firstLine.compare("date | value")) 
-			throw std::runtime_error("Error: Invalid Header in input file");
+    if (firstLine.compare("date | value"))
+      throw std::runtime_error("Error: Invalid Header in input file");
     if (count != 1 || !checkHeader(firstLine, 1)) {
       printErr("Envalid Header input file");
       return false;
@@ -221,11 +230,26 @@ bool BitcoinExchange::validDate(std::string &date) {
 }
 
 bool BitcoinExchange::validValue(std::string &value) {
+  std::stringstream ss(value);
+
   if (!isStrNumber(value))
     throw std::runtime_error("Error: value is not valid");
-  float nValue = atof(value.c_str()); // converting str to int
-  if (nValue <= 0)
+
+  double nValue; // converting str to int
+                 //
+  if (!(ss >> nValue)) {
+    throw std::runtime_error("Error: value is not valid");
+  }
+
+  std::string tmp;
+
+  if (ss >> tmp) {
+    throw std::runtime_error("Error: value is not valid");
+  }
+
+  if (nValue <= 0) {
     throw std::runtime_error("Error: not a positive number");
+  }
   if (nValue > 1000)
     throw std::runtime_error("Error: too large a number");
   this->value = nValue;
